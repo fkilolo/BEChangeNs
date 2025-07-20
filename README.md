@@ -22,6 +22,6 @@ Cách chạy tại chế độ production:
 
 Tài khoản đăng nhập
 admin@gmail.com và user@gmail.com
-pass: 123456
+pass: admin123
 
 nvm node 20.10.0

@@ -1,4 +1,4 @@
     #chạy các lệnh trên vào cmd
     #docker pull mongo
-    #docker run -d --name mongodb-container -p 27018:27017 -v mongodb-data:/data/db mongo
+    #docker run -d --name mongodb-container -p 27017:27017 -v mongodb-data:/data/db mongo
     #docker start mongodb-container

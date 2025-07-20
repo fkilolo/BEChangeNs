@@ -2,17 +2,17 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import aqp from "api-query-params";
 import mongoose from "mongoose";
-import { SoftDeleteModel } from "soft-delete-plugin-mongoose";
 import { CreatePermissionDto } from "./dto/create-permission.dto";
 import { UpdatePermissionDto } from "./dto/update-permission.dto";
 import { Permission, PermissionDocument } from "./schemas/permission.schemas";
 import { IUser } from "@/modules/users/users.interface";
+import { SoftDeleteModel } from '@/shared/types/mongoose-soft-delete.type';
 
 @Injectable()
 export class PermissionsService {
   constructor(
     @InjectModel(Permission.name)
-    private permissionModel: SoftDeleteModel<PermissionDocument>
+    private readonly permissionModel: SoftDeleteModel<PermissionDocument>,
   ) {}
 
   async create(createPermissionDto: CreatePermissionDto, user: IUser) {
@@ -116,6 +116,6 @@ export class PermissionsService {
         },
       }
     );
-    return await this.permissionModel.softDelete({ _id: id });
+    return await (this.permissionModel as any).delete({ _id: id });
   }
 }

@@ -5180,6 +5180,11 @@ mongodb@6.7.0:
     bson "^6.7.0"
     mongodb-connection-string-url "^3.0.0"
 
+mongoose-delete@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.npmjs.org/mongoose-delete/-/mongoose-delete-1.0.2.tgz"
+  integrity sha512-W+p9ULLiYHcEz77wQECp6gNnh2NcXf30KRIE3nAyjjsStqmBKJDL5eXTnX0xerGG2gCGx6mI7bO3+ch88tQ+tg==
+
 mongoose@8.5.1:
   version "8.5.1"
   resolved "https://registry.npmjs.org/mongoose/-/mongoose-8.5.1.tgz"

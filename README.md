@@ -24,4 +24,6 @@ Tài khoản đăng nhập
 admin@gmail.com và user@gmail.com
 pass: admin123
 
+http://localhost:8081/api/swagger#/
+
 nvm node 20.10.0

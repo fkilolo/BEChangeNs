@@ -124,28 +124,47 @@ export class SavController {
     return this.savService.updateDomainPrivacy(body.domain_name, body.enabled);
   }
 
+
   @Post('update-whois')
   @ApiOperation({ summary: 'Update WHOIS contact information for a domain' })
   @ApiBody({
+    required: true,
     description: 'Full WHOIS contact payload',
     schema: {
       type: 'object',
+      required: [
+        'domain_name',
+        'name',
+        'email_address',
+        'street',
+        'city',
+        'country',
+        'phone',
+        'state',
+        'postal_code',
+      ],
       properties: {
         domain_name: { type: 'string', example: 'example.com' },
-        registrant: {
-          type: 'object',
-          example: {
-            name: 'John Doe',
-            email: 'john@example.com',
-            phone: '+1234567890',
-          },
-        },
+        name: { type: 'string', example: 'John Doe' },
+        organization: { type: 'string', example: 'Example Corp' },
+        email_address: { type: 'string', example: 'john@example.com' },
+        street: { type: 'string', example: '123 Main St' },
+        city: { type: 'string', example: 'New York' },
+        country: { type: 'string', example: 'US' },
+        phone: { type: 'string', example: '+1234567890' },
+        state: { type: 'string', example: 'NY' },
+        postal_code: { type: 'string', example: '10001' },
+        update_registrant: { type: 'boolean', example: true },
+        update_tech: { type: 'boolean', example: false },
+        update_admin: { type: 'boolean', example: true },
       },
     },
   })
   updateDomainWhoisContacts(@Body() body: any) {
     return this.savService.updateDomainWhoisContacts(body);
   }
+
+
 
   @Post('list-domain-sale')
   @ApiOperation({ summary: 'List external domain for sale' })

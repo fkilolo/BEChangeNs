@@ -1,7 +1,7 @@
 import { RolesService } from "@/app-auth/roles/roles.service";
 import { IUser } from "@/modules/users/users.interface";
 import { UsersService } from "@/modules/users/users.service";
-import { Injectable } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
@@ -22,17 +22,28 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: IUser) {
     const { _id, userName, role, userBusinessId } = payload;
-    //add permission
-    const userRole = role as unknown as { _id: string; name: string };
-    const temp = (await this.rolesService.findOne(userRole._id))?.toObject();
-    //req.user
+  
+    // Lấy _id của role dù là ObjectId hay object có _id
+    const roleId = typeof role === 'object' && role !== null ? (role as any)._id : role;
+  
+    // Tìm role từ DB
+    const roleDoc = await this.rolesService.findOne(roleId);
+    if (!roleDoc) {
+      throw new UnauthorizedException('Role không tồn tại');
+    }
+  
+    // Chuyển về plain object nếu là mongoose document
+    const roleData = roleDoc.toObject?.() ?? roleDoc;
+  
+    // Trả về thông tin user kèm quyền
     return {
       _id,
       userName,
-      role,
       userBusinessId,
-      permissions: temp?.permissions ?? [],
-      //@ts-ignore
+      role: roleData,
+      permissions: roleData.permissions || [],
     };
   }
+  
+  
 }

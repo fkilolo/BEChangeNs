@@ -230,6 +230,11 @@ export class PermissionSeederService implements OnModuleInit {
         name: 'get domain pricing',
         module: 'SAV',
       },
+      { method: 'POST', apiPath: '/api/v1/sav', name: 'create sav', module: 'SAV' },
+      { method: 'GET', apiPath: '/api/v1/sav', name: 'get sav list', module: 'SAV' },
+      { method: 'GET', apiPath: '/api/v1/sav/:id', name: 'get sav by id', module: 'SAV' },
+      { method: 'PATCH', apiPath: '/api/v1/sav/:id', name: 'update sav', module: 'SAV' },
+      { method: 'DELETE', apiPath: '/api/v1/sav/:id', name: 'delete sav', module: 'SAV' },
     ];
 
     for (const permission of permissions) {

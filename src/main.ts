@@ -9,7 +9,9 @@ import { PermissionSeederService } from './app-auth/permissions/permissions.seed
 import { RoleSeeder } from './app-auth/roles/roles.seed';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug'], // 👈 Bật log debug
+  });
   const configService = app.get(ConfigService);
   const port = configService.get('PORT');
   app.setGlobalPrefix("api/v1", { exclude: [''] });

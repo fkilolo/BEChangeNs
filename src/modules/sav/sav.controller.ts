@@ -1,31 +1,65 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { SavService } from './sav.service';
+import { ResponseMessage } from '@/decorator/customize';
+import { User } from '@/shared/decorators/customize.decorator';
+import { IUser } from '../users/users.interface';
+import { CreateSavDto } from './dto/create-sav.dto';
+import { UpdateSavDto } from './dto/update-sav.dto';
+import { JwtAuthGuard } from '@/app-auth/auth/jwt-auth.guard';
 
 @ApiTags('Sav')
 @Controller('sav')
 export class SavController {
   constructor(private readonly savService: SavService) {}
 
+  
+  @Post()
+  @ApiOperation({ summary: 'Tạo kết nối Sav' })
+  create(@Body() createSavDto: CreateSavDto, @User() user: IUser) {
+    return this.savService.create(createSavDto, user);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Lấy tất cả kết nối Sav' })
+  findAll() {
+    return this.savService.findAll();
+  }
+
+  
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Cập nhật kết nối Sav' })
+  update(@Param('id') id: string, @Body() updateSavDto: UpdateSavDto) {
+    return this.savService.update(id, updateSavDto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Xoá mềm kết nối Sav' })
+  remove(@Param('id') id: string) {
+    return this.savService.remove(id);
+  }
+
+  
   @Get('domains')
   @ApiOperation({ summary: 'Get active domains' })
   @ApiResponse({ status: 200, description: 'List of active domains' })
-  getActiveDomains() {
-    return this.savService.getActiveDomains();
+  getActiveDomains(@User() user: IUser) {
+    return this.savService.getActiveDomains(user);
   }
 
   @Get('auction-sales')
   @ApiOperation({ summary: 'Get recent auction sales' })
   @ApiResponse({ status: 200, description: 'Recent auction sales' })
-  getRecentAuctionSales() {
-    return this.savService.getRecentAuctionSales();
+  getRecentAuctionSales(@User() user: IUser) {
+    return this.savService.getRecentAuctionSales(user);
   }
 
   @Get('premium-sales')
   @ApiOperation({ summary: 'Get recent premium sales' })
   @ApiResponse({ status: 200, description: 'Recent premium domain sales' })
-  getRecentPremiumSales() {
-    return this.savService.getRecentPremiumSales();
+  getRecentPremiumSales(@User() user: IUser) {
+    return this.savService.getRecentPremiumSales(user);
   }
 
   @Post('remove-domain-sale')
@@ -39,8 +73,8 @@ export class SavController {
       },
     },
   })
-  removeDomainForSale(@Body('domain_name') domainName: string) {
-    return this.savService.removeDomainForSale(domainName);
+  removeDomainForSale(@Body('domain_name') domainName: string, @User() user: IUser) {
+    return this.savService.removeDomainForSale(domainName, user);
   }
 
   @Post('submit-auth-code')
@@ -55,8 +89,8 @@ export class SavController {
       },
     },
   })
-  submitAuthCode(@Body() body: { domain_name: string; auth_code: string }) {
-    return this.savService.submitAuthCode(body.domain_name, body.auth_code);
+  submitAuthCode(@Body() body: { domain_name: string; auth_code: string }, @User() user: IUser) {
+    return this.savService.submitAuthCode(body.domain_name, body.auth_code, user);
   }
 
   @Post('update-auto-renew')
@@ -71,8 +105,8 @@ export class SavController {
       },
     },
   })
-  updateAutoRenewal(@Body() body: { domain_name: string; enabled: boolean }) {
-    return this.savService.updateAutoRenewal(body.domain_name, body.enabled);
+  updateAutoRenewal(@Body() body: { domain_name: string; enabled: boolean }, @User() user: IUser) {
+    return this.savService.updateAutoRenewal(body.domain_name, body.enabled, user);
   }
 
   @Post('update-sale-price')
@@ -87,8 +121,8 @@ export class SavController {
       },
     },
   })
-  updateDomainForSalePrice(@Body() body: { domain_name: string; sale_price: number }) {
-    return this.savService.updateDomainForSalePrice(body.domain_name, body.sale_price);
+  updateDomainForSalePrice(@Body() body: { domain_name: string; sale_price: number }, @User() user: IUser) {
+    return this.savService.updateDomainForSalePrice(body.domain_name, body.sale_price, user);
   }
 
   @Post('update-nameservers')
@@ -104,8 +138,8 @@ export class SavController {
       },
     },
   })
-  updateDomainNameservers(@Body() body: { domain_name: string; ns_1: string; ns_2: string }) {
-    return this.savService.updateDomainNameservers(body.domain_name, body.ns_1, body.ns_2);
+  updateDomainNameservers(@Body() body: { domain_name: string; ns_1: string; ns_2: string }, @User() user: IUser) {
+    return this.savService.updateDomainNameservers(body.domain_name, body.ns_1, body.ns_2, user);
   }
 
   @Post('update-privacy')
@@ -120,8 +154,8 @@ export class SavController {
       },
     },
   })
-  updateDomainPrivacy(@Body() body: { domain_name: string; enabled: boolean }) {
-    return this.savService.updateDomainPrivacy(body.domain_name, body.enabled);
+  updateDomainPrivacy(@Body() body: { domain_name: string; enabled: boolean }, @User() user: IUser) {
+    return this.savService.updateDomainPrivacy(body.domain_name, body.enabled, user);
   }
 
 
@@ -160,8 +194,8 @@ export class SavController {
       },
     },
   })
-  updateDomainWhoisContacts(@Body() body: any) {
-    return this.savService.updateDomainWhoisContacts(body);
+  updateDomainWhoisContacts(@Body() body: any, @User() user: IUser) {
+    return this.savService.updateDomainWhoisContacts(body, user);
   }
 
 
@@ -178,14 +212,22 @@ export class SavController {
       },
     },
   })
-  listExternalDomainForSale(@Body() body: { domain_name: string; sale_price: number }) {
-    return this.savService.listExternalDomainForSale(body.domain_name, body.sale_price);
+      listExternalDomainForSale(@Body() body: { domain_name: string; sale_price: number }, @User() user: IUser) {
+    return this.savService.listExternalDomainForSale(body.domain_name, body.sale_price, user);
   }
 
   @Get('pricing')
   @ApiOperation({ summary: 'Get domain pricing list' })
   @ApiResponse({ status: 200, description: 'Pricing for different TLDs' })
-  getDomainPricing() {
-    return this.savService.getDomainPricing();
+    getDomainPricing(@User() user: IUser) {
+    return this.savService.getDomainPricing(user);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Lấy chi tiết kết nối Sav' })
+  async findOne(@Param('id') id: string) {
+    const data = await this.savService.findOne(id);
+    if (!data) throw new NotFoundException('Không tìm thấy kết nối Sav');
+    return data;
   }
 }

@@ -5,7 +5,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import aqp from "api-query-params";
 import { compareSync, genSaltSync, hashSync } from "bcryptjs";
 import mongoose from "mongoose";
-import { SoftDeleteModel } from "soft-delete-plugin-mongoose";
+import { SoftDeleteModel } from "@/shared/types/mongoose-soft-delete.type";
 import {
   EMAIL_ADMIN,
   ROLE_TT_TP,
@@ -209,7 +209,7 @@ export class UsersService {
         },
       }
     );
-    return await this.userModel.softDelete({ _id: id });
+    return await (this.userModel as any).delete({ _id: id });
   }
 
   async updateUserToken(refreshToken: string, id: string) {

@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
 import { Role } from "src/app-auth/roles/schemas/role.schemas";
 import { BaseModel } from "src/shared/model/baseModel.dto";
-
+import mongooseDelete from 'mongoose-delete';
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: true })
@@ -39,3 +39,7 @@ export class User extends BaseModel {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+UserSchema.plugin(mongooseDelete, {
+  deletedAt: true,
+  overrideMethods: 'all', // Ghi đè find, count, etc.
+});

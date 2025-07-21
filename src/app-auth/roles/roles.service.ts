@@ -125,6 +125,6 @@ export class RolesService {
         },
       },
     );
-    return await this.roleModel.softDelete({ _id: id });
+    return await (this.roleModel as any).delete({ _id: id });
   }
 }

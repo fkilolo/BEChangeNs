@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { SpaceshipService } from './spaceship.service';
 import { CreateSpaceshipDto } from './dto/create-spaceship.dto';
@@ -17,8 +17,11 @@ export class SpaceshipController {
 
   @Get()
   @ApiOperation({ summary: 'Lấy danh sách spaceship connect' })
-  findAll() {
-    return this.spaceshipService.findAll();
+  findAll(
+    @Query('current') current: number = 1,
+    @Query('pageSize') pageSize: number = 10
+  ) {
+    return this.spaceshipService.findAll(+current, +pageSize);
   }
 
   @Get(':id')

@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 const SAV_API_BASE = 'https://api.sav.com/domains_api_v1';
-const APIKEY = process.env.SAV_API_KEY || 'demo-api-key';
+const APIKEY = process.env.SAV_API_KEY || 'fqNKjEPVxod4VhZdtA4voDTQgmDLW5P41jCSRxnH';
 
 const savHeaders = {
   headers: {

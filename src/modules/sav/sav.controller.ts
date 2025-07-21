@@ -142,6 +142,27 @@ export class SavController {
     return this.savService.updateDomainNameservers(body.domain_name, body.ns_1, body.ns_2, user);
   }
 
+  @Post('update-all-nameservers')
+  @ApiOperation({ summary: 'Cập nhật nameservers cho tất cả domain đang active' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['ns_1', 'ns_2'],
+      properties: {
+        ns_1: { type: 'string', example: 'ns1.sav.com' },
+        ns_2: { type: 'string', example: 'ns2.sav.com' },
+      },
+    },
+  })
+  
+  updateAllDomainNameservers(
+    @Body() body: { ns_1: string; ns_2: string },
+    @User() user: IUser,
+  ) {
+    return this.savService.updateAllDomainNameservers(body.ns_1, body.ns_2, user);
+  }
+  
+
   @Post('update-privacy')
   @ApiOperation({ summary: 'Update privacy protection for a domain' })
   @ApiBody({

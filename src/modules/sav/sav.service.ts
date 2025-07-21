@@ -170,6 +170,44 @@ export class SavService {
     }
   }
 
+  async updateAllDomainNameservers(ns_1: string, ns_2: string, user: IUser) {
+    try {
+      const headers = await this.getHeaderByUser(user);
+      const activeDomainsRes = await axios.get(`${SAV_API_BASE}/get_active_domains_in_account`, headers);
+      const domains = activeDomainsRes.data?.domains || [];
+  
+      if (!Array.isArray(domains) || domains.length === 0) {
+        throw new NotFoundException('Không tìm thấy domain nào để cập nhật');
+      }
+  
+      const results = await Promise.allSettled(
+        domains.map((domain: any) => {
+          const domainName = domain.domain_name || domain.name || domain;
+          const url = `${SAV_API_BASE}/update_domain_nameservers?domain_name=${domainName}&ns_1=${ns_1}&ns_2=${ns_2}`;
+          return axios.get(url, headers);
+        }),
+      );
+  
+      const summary = results.map((res, idx) => {
+        const domain = domains[idx]?.domain_name || domains[idx];
+        if (res.status === 'fulfilled') {
+          return { domain, success: true, data: res.value.data };
+        } else {
+          return { domain, success: false, error: res.reason?.message || 'Unknown error' };
+        }
+      });
+  
+      return {
+        total: domains.length,
+        updated: summary.filter(r => r.success).length,
+        failed: summary.filter(r => !r.success).length,
+        results: summary,
+      };
+    } catch (err) {
+      this.handleError(err);
+    }
+  }
+  
   async updateDomainPrivacy(domain_name: string, enabled: boolean, user: IUser) {
     try {
       const headers = await this.getHeaderByUser(user);

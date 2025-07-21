@@ -13,6 +13,7 @@ import { PermissionsModule } from './app-auth/permissions/permissions.module';
 import { JwtAuthGuard } from './app-auth/auth/jwt-auth.guard';
 import { ThrottlerModule } from "@nestjs/throttler";
 import { SavModule } from './modules/sav/sav.module';
+import { SpaceshipModule } from './modules/spaceship/spaceship.module';
 @Module({
   imports: [
     UsersModule,
@@ -62,7 +63,8 @@ import { SavModule } from './modules/sav/sav.module';
       inject: [ConfigService],
 
     }),
-    SavModule
+    SavModule,
+    SpaceshipModule
   ],
   controllers: [AppController],
   providers: [

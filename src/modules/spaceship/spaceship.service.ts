@@ -15,8 +15,21 @@ export class SpaceshipService {
     return this.spaceshipModel.create(createDto);
   }
 
-  async findAll() {
-    return this.spaceshipModel.find();
+  async findAll(current = 1, pageSize = 10) {
+    const skip = (current - 1) * pageSize;
+    const [result, total] = await Promise.all([
+      this.spaceshipModel.find().skip(skip).limit(pageSize),
+      this.spaceshipModel.countDocuments()
+    ]);
+    return {
+      meta: {
+        current,
+        pageSize,
+        pages: Math.ceil(total / pageSize),
+        total
+      },
+      result
+    };
   }
 
   async findOne(id: string) {

@@ -12,6 +12,7 @@ import { RolesModule } from './app-auth/roles/roles.module';
 import { PermissionsModule } from './app-auth/permissions/permissions.module';
 import { JwtAuthGuard } from './app-auth/auth/jwt-auth.guard';
 import { ThrottlerModule } from "@nestjs/throttler";
+import { SavModule } from './modules/sav/sav.module';
 @Module({
   imports: [
     UsersModule,
@@ -60,7 +61,8 @@ import { ThrottlerModule } from "@nestjs/throttler";
       }),
       inject: [ConfigService],
 
-    })
+    }),
+    SavModule
   ],
   controllers: [AppController],
   providers: [

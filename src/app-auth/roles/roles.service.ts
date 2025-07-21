@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import aqp from 'api-query-params';
@@ -91,22 +91,27 @@ export class RolesService {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new BadRequestException('not found role');
     }
+  
     try {
       const role = await this.roleModel.updateOne(
         { _id: id },
         {
-          ...updateRoleDto,
-          updatedBy: {
-            _id: user._id,
-            name: user.userName,
+          $set: {
+            ...updateRoleDto,
+            updatedBy: {
+              _id: user._id,
+              name: user.userName,
+            },
           },
         },
       );
+  
       return role;
     } catch (error) {
-      return error;
+      throw new InternalServerErrorException(error.message || 'Update role failed');
     }
   }
+  
 
   async remove(id: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id)) return 'not found user';

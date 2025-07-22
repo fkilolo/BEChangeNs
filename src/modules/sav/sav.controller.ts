@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { SavService } from './sav.service';
 import { ResponseMessage } from '@/decorator/customize';
@@ -22,8 +22,13 @@ export class SavController {
 
   @Get()
   @ApiOperation({ summary: 'Lấy tất cả kết nối Sav' })
-  findAll() {
-    return this.savService.findAll();
+  
+  findAll(
+  @Query("current") current: string,
+  @Query("pageSize") pageSize: string,
+  @Query() qs: string,
+  @User() user: IUser) {
+    return this.savService.findAll(+current, +pageSize, qs, user);
   }
 
   

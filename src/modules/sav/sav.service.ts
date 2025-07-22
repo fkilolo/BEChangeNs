@@ -13,6 +13,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Sav, SavDocument } from './schemas/sav.schemas';
 import { Model, Types } from 'mongoose';
 import { UpdateSavDto } from './dto/update-sav.dto';
+import * as aqp from 'api-query-params';
 
 dotenv.config();
 
@@ -49,9 +50,44 @@ export class SavService {
   }
   
 
-  async findAll() {
-    return this.savModel.find().sort({ createdAt: -1 }).lean();
-  }
+   // Đảm bảo đã cài `api-query-params`
+
+async findAll(current: number, pageSize: number, qs: string, user: IUser) {
+  const { filter = {}, sort, population } = aqp.default(qs);
+  delete filter.current;
+  delete filter.pageSize;
+
+  // Nếu bạn muốn lọc theo quyền người dùng như ROLE_TT_TP, có thể thêm vào đây.
+  // Ví dụ:
+  // if (user?.role?.name === 'CTV') {
+  //   filter.createdBy = user._id;
+  // }
+
+  const offset = (+current - 1) * +pageSize;
+  const limit = +pageSize || 10;
+
+  const totalItems = await this.savModel.countDocuments(filter);
+  const totalPages = Math.ceil(totalItems / limit);
+
+  const result = await this.savModel
+    .find(filter)
+    .skip(offset)
+    .limit(limit)
+    .sort(sort as any)
+    .populate(population)
+    .lean();
+
+  return {
+    meta: {
+      current: +current,
+      pageSize: +pageSize,
+      pages: totalPages,
+      total: totalItems,
+    },
+    result,
+  };
+}
+
 
   async findOne(id: string) {
     if (!Types.ObjectId.isValid(id)) return null;

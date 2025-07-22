@@ -51,13 +51,25 @@ export class SpaceshipController {
   @ApiQuery({ name: 'take', required: false, type: Number })
   @ApiQuery({ name: 'skip', required: false, type: Number })
   @ApiQuery({ name: 'orderBy', required: false, type: String })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Tên domain' })
   getDomains(
     @Param('id') id: string,
     @Query('take') take?: number,
     @Query('skip') skip?: number,
-    @Query('orderBy') orderBy?: string
+    @Query('orderBy') orderBy?: string,
+    @Query('search') search?: string
   ) {
-    return this.spaceshipService.getDomains(id, take, skip, orderBy);
+    return this.spaceshipService.getDomains(id, take, skip, orderBy, search);
+  }
+
+  @Get('domains/:conect_id/detail/:domain')
+  @ResponseMessage('Lấy chi tiết domain từ spaceship thành công')
+  @ApiOperation({ summary: 'Lấy chi tiết domain từ spaceship connect' })
+  async getDomainDetail(
+    @Param('conect_id') conect_id: string,
+    @Param('domain') domain: string
+  ) {
+    return this.spaceshipService.getDomainDetail(conect_id, domain);
   }
 
   @Post('domains/update_nameservers')

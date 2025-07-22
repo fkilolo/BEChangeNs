@@ -55,13 +55,22 @@ export class SpaceshipService {
     return doc;
   }
 
-  async getDomains(id: string, take?: number, skip?: number, orderBy?: string) {
+  async getDomains(id: string, take?: number, skip?: number, orderBy?: string, search?: string) {
     // Lấy thông tin connect từ DB
     const connect = await this.spaceshipModel.findById(id);
     if (!connect) throw new NotFoundException('Spaceship connect not found');
     const apikey = connect.apikey;
     const secretkey = connect.secretkey;
     if (!apikey || !secretkey) throw new NotFoundException('Thiếu apikey hoặc secretkey');
+
+    // Nếu có search, gọi getDomainDetail
+    if (search) {
+        const result = await this.getDomainDetail(id, search);
+        return {
+            items: [result],
+            total: 1,
+        }
+    }
 
     // Gán mặc định
     take = take && take >= 1 && take <= 100 ? take : 20;
@@ -160,5 +169,27 @@ export class SpaceshipService {
       hosts
     };
     return this.updateNameservers(updateBody);
+  }
+
+  async getDomainDetail(conect_id: string, domain: string) {
+    // Lấy thông tin connect từ DB
+    const connect = await this.spaceshipModel.findById(conect_id);
+    if (!connect) throw new NotFoundException('Spaceship connect not found');
+    const apikey = connect.apikey;
+    const secretkey = connect.secretkey;
+    if (!apikey || !secretkey) throw new NotFoundException('Thiếu apikey hoặc secretkey');
+
+    // Gọi API lấy chi tiết domain
+    const headers = {
+      'X-API-Key': apikey,
+      'X-API-Secret': secretkey
+    };
+    try {
+      const url = `${SPACESHIP_API_BASE}/domains/${encodeURIComponent(domain)}`;
+      const res = await axios.get(url, { headers });
+      return res.data;
+    } catch (err) {
+      throw new NotFoundException(err?.response?.data?.message || 'Không lấy được chi tiết domain từ spaceship');
+    }
   }
 } 

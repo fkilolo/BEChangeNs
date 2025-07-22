@@ -20,11 +20,15 @@ export class SpaceshipService {
     return this.spaceshipModel.create(createDto);
   }
 
-  async findAll(current = 1, pageSize = 10) {
+  async findAll(current = 1, pageSize = 10, search?: string) {
     const skip = (current - 1) * pageSize;
+    const filter: any = {};
+    if (search) {
+      filter.name = { $regex: search, $options: 'i' };
+    }
     const [result, total] = await Promise.all([
-      this.spaceshipModel.find().skip(skip).limit(pageSize),
-      this.spaceshipModel.countDocuments()
+      this.spaceshipModel.find(filter).skip(skip).limit(pageSize),
+      this.spaceshipModel.countDocuments(filter)
     ]);
     return {
       meta: {

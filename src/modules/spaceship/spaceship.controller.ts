@@ -19,12 +19,15 @@ export class SpaceshipController {
   }
 
   @Get()
+  @ResponseMessage('Hiển thị danh sách spaceship connect thành công')
   @ApiOperation({ summary: 'Lấy danh sách spaceship connect' })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Tìm kiếm theo tên connect' })
   findAll(
     @Query('current') current: number = 1,
-    @Query('pageSize') pageSize: number = 10
+    @Query('pageSize') pageSize: number = 10,
+    @Query('search') search?: string
   ) {
-    return this.spaceshipService.findAll(+current, +pageSize);
+    return this.spaceshipService.findAll(+current, +pageSize, search);
   }
 
   @Get(':id')

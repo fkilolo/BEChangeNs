@@ -22,7 +22,7 @@ export class SpaceshipService {
 
     const existing = await this.spaceshipModel.findOne({ userName: createDto.userName });
     if (existing) {
-      throw new BadRequestException('Tên kết nối Spaceship đã tồn tại');
+      return existing;
     }
 
     return this.spaceshipModel.create(createDto);

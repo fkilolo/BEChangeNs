@@ -3,9 +3,10 @@ import { ApiTags, ApiOperation, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { SpaceshipService } from './spaceship.service';
 import { CreateSpaceshipDto } from './dto/create-spaceship.dto';
 import { UpdateSpaceshipDto } from './dto/update-spaceship.dto';
-import { ResponseMessage } from 'src/shared/decorators/customize.decorator';
+import { ResponseMessage, User } from 'src/shared/decorators/customize.decorator';
 import { UpdateNameserversDto } from './dto/update-nameservers.dto';
 import { UpdateAllNameserversDto } from './dto/update-all-nameservers.dto';
+import { IUser } from 'src/modules/users/users.interface';
 
 @ApiTags('Spaceship')
 @Controller('spaceship')
@@ -14,8 +15,8 @@ export class SpaceshipController {
 
   @Post()
   @ApiOperation({ summary: 'Tạo mới spaceship connect' })
-  create(@Body() createDto: CreateSpaceshipDto) {
-    return this.spaceshipService.create(createDto);
+  create(@Body() createDto: CreateSpaceshipDto, @User() user: IUser) {
+    return this.spaceshipService.create(createDto, user);
   }
 
   @Get()

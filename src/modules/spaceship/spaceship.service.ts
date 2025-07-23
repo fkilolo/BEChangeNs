@@ -27,7 +27,10 @@ export class SpaceshipService {
       filter.name = { $regex: search, $options: 'i' };
     }
     const [result, total] = await Promise.all([
-      this.spaceshipModel.find(filter).skip(skip).limit(pageSize),
+      this.spaceshipModel.find(filter)
+        .sort({ createdAt: -1 }) // Sắp xếp mới nhất đến cũ nhất
+        .skip(skip)
+        .limit(pageSize),
       this.spaceshipModel.countDocuments(filter)
     ]);
     return {
@@ -96,6 +99,44 @@ export class SpaceshipService {
     }
   }
 
+  // gọi bất đồng bộ
+  // async updateNameservers(body: {
+  //   conect_id: string;
+  //   provider: string;
+  //   domain: string[];
+  //   hosts: string[];
+  // }) {
+  //   const { conect_id, provider, domain, hosts } = body;
+  //   // Lấy thông tin connect từ DB
+  //   const connect = await this.spaceshipModel.findById(conect_id);
+  //   if (!connect) throw new NotFoundException('Spaceship connect not found');
+  //   const apikey = connect.apikey;
+  //   const secretkey = connect.secretkey;
+  //   if (!apikey || !secretkey) throw new NotFoundException('Thiếu apikey hoặc secretkey');
+
+  //   // Validate input
+  //   if (!Array.isArray(domain) || domain.length === 0) throw new NotFoundException('Danh sách domain không hợp lệ');
+  //   if (!Array.isArray(hosts) || hosts.length === 0) throw new NotFoundException('Danh sách hosts không hợp lệ');
+  //   if (!provider) throw new NotFoundException('Thiếu provider');
+
+  //   // Gọi API update cho từng domain (bất đồng bộ)
+  //   const headers = {
+  //     'X-API-Key': apikey,
+  //     'X-API-Secret': secretkey,
+  //     'content-type': 'application/json'
+  //   };
+  //   const results = await Promise.all(domain.map(async (d) => {
+  //     const url = `${SPACESHIP_API_BASE}/domains/${encodeURIComponent(d)}/nameservers`;
+  //     try {
+  //       const res = await axios.put(url, { provider, hosts }, { headers });
+  //       return { domain: d, success: true, data: res.data };
+  //     } catch (err) {
+  //       return { domain: d, success: false, error: err?.response?.data?.message || err.message };
+  //     }
+  //   }));
+  //   return results;
+  // }
+
   async updateNameservers(body: {
     conect_id: string;
     provider: string;
@@ -115,21 +156,22 @@ export class SpaceshipService {
     if (!Array.isArray(hosts) || hosts.length === 0) throw new NotFoundException('Danh sách hosts không hợp lệ');
     if (!provider) throw new NotFoundException('Thiếu provider');
 
-    // Gọi API update cho từng domain (bất đồng bộ)
+    // Gọi API update cho từng domain (tuần tự)
     const headers = {
       'X-API-Key': apikey,
       'X-API-Secret': secretkey,
       'content-type': 'application/json'
     };
-    const results = await Promise.all(domain.map(async (d) => {
+    const results = [];
+    for (const d of domain) {
       const url = `${SPACESHIP_API_BASE}/domains/${encodeURIComponent(d)}/nameservers`;
       try {
         const res = await axios.put(url, { provider, hosts }, { headers });
-        return { domain: d, success: true, data: res.data };
+        results.push({ domain: d, success: true, data: res.data });
       } catch (err) {
-        return { domain: d, success: false, error: err?.response?.data?.message || err.message };
+        results.push({ domain: d, success: false, error: err?.response?.data?.message || err.message });
       }
-    }));
+    }
     return results;
   }
 

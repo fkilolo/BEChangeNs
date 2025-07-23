@@ -20,11 +20,6 @@ export class SpaceshipService {
   async create(createDto: CreateSpaceshipDto, user: IUser) {
     createDto.userName = user.userName;
 
-    const existing = await this.spaceshipModel.findOne({ userName: createDto.userName });
-    if (existing) {
-      return existing;
-    }
-
     return this.spaceshipModel.create(createDto);
   }
 

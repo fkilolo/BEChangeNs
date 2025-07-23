@@ -206,26 +206,23 @@ async findAll(current: number, pageSize: number, qs: string, user: IUser) {
     }
   }
 
-  async updateAllDomainNameservers(ns_1: string, ns_2: string, user: IUser) {
+  async updateSelectedDomainNameservers(ns_1: string, ns_2: string, domainList: string[], user: IUser) {
     try {
-      const headers = await this.getHeaderByUser(user);
-      const activeDomainsRes = await axios.get(`${SAV_API_BASE}/get_active_domains_in_account`, headers);
-      const domains = activeDomainsRes.data?.domains || [];
-  
-      if (!Array.isArray(domains) || domains.length === 0) {
-        throw new NotFoundException('Không tìm thấy domain nào để cập nhật');
+      if (!Array.isArray(domainList) || domainList.length === 0) {
+        throw new BadRequestException('Danh sách domain không được để trống');
       }
   
+      const headers = await this.getHeaderByUser(user);
+  
       const results = await Promise.allSettled(
-        domains.map((domain: any) => {
-          const domainName = domain.domain_name || domain.name || domain;
+        domainList.map((domainName: string) => {
           const url = `${SAV_API_BASE}/update_domain_nameservers?domain_name=${domainName}&ns_1=${ns_1}&ns_2=${ns_2}`;
           return axios.get(url, headers);
         }),
       );
   
       const summary = results.map((res, idx) => {
-        const domain = domains[idx]?.domain_name || domains[idx];
+        const domain = domainList[idx];
         if (res.status === 'fulfilled') {
           return { domain, success: true, data: res.value.data };
         } else {
@@ -234,7 +231,7 @@ async findAll(current: number, pageSize: number, qs: string, user: IUser) {
       });
   
       return {
-        total: domains.length,
+        total: domainList.length,
         updated: summary.filter(r => r.success).length,
         failed: summary.filter(r => !r.success).length,
         results: summary,
@@ -243,6 +240,7 @@ async findAll(current: number, pageSize: number, qs: string, user: IUser) {
       this.handleError(err);
     }
   }
+  
   
   async updateDomainPrivacy(domain_name: string, enabled: boolean, user: IUser) {
     try {

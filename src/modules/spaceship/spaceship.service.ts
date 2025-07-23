@@ -53,7 +53,11 @@ export class SpaceshipService {
     return doc;
   }
 
-  async update(id: string, updateDto: UpdateSpaceshipDto) {
+  async update(id: string, updateDto: any) {
+    // Nếu userName là undefined thì không đổi, nếu là rỗng thì xóa khỏi updateDto
+    if (updateDto.userName === '') {
+      delete updateDto.userName;
+    }
     const doc = await this.spaceshipModel.findByIdAndUpdate(id, updateDto, { new: true });
     if (!doc) throw new NotFoundException('Spaceship not found');
     return doc;

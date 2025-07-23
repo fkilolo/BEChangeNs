@@ -208,6 +208,12 @@ export class PermissionSeederService implements OnModuleInit {
       },
       {
         method: 'POST',
+        apiPath: '/api/v1/sav/update-all-nameservers',
+        name: 'update all sav nameservers',
+        module: 'SAV',
+      },      
+      {
+        method: 'POST',
         apiPath: '/api/v1/sav/update-privacy',
         name: 'update domain privacy',
         module: 'SAV',
@@ -230,11 +236,91 @@ export class PermissionSeederService implements OnModuleInit {
         name: 'get domain pricing',
         module: 'SAV',
       },
-      { method: 'POST', apiPath: '/api/v1/sav', name: 'create sav', module: 'SAV' },
-      { method: 'GET', apiPath: '/api/v1/sav', name: 'get sav list', module: 'SAV' },
-      { method: 'GET', apiPath: '/api/v1/sav/:id', name: 'get sav by id', module: 'SAV' },
-      { method: 'PATCH', apiPath: '/api/v1/sav/:id', name: 'update sav', module: 'SAV' },
-      { method: 'DELETE', apiPath: '/api/v1/sav/:id', name: 'delete sav', module: 'SAV' },
+      {
+        method: 'POST',
+        apiPath: '/api/v1/sav',
+        name: 'create sav',
+        module: 'SAV',
+      },
+      {
+        method: 'GET',
+        apiPath: '/api/v1/sav',
+        name: 'get sav list',
+        module: 'SAV',
+      },
+      {
+        method: 'GET',
+        apiPath: '/api/v1/sav/:id',
+        name: 'get sav by id',
+        module: 'SAV',
+      },
+      {
+        method: 'PATCH',
+        apiPath: '/api/v1/sav/:id',
+        name: 'update sav',
+        module: 'SAV',
+      },
+      {
+        method: 'DELETE',
+        apiPath: '/api/v1/sav/:id',
+        name: 'delete sav',
+        module: 'SAV',
+      },
+
+      {
+        method: 'POST',
+        apiPath: '/api/v1/spaceship',
+        name: 'create spaceship',
+        module: 'SPACESHIP',
+      },
+      {
+        method: 'GET',
+        apiPath: '/api/v1/spaceship',
+        name: 'get spaceship list',
+        module: 'SPACESHIP',
+      },
+      {
+        method: 'GET',
+        apiPath: '/api/v1/spaceship/:id',
+        name: 'get spaceship by id',
+        module: 'SPACESHIP',
+      },
+      {
+        method: 'PATCH',
+        apiPath: '/api/v1/spaceship/:id',
+        name: 'update spaceship',
+        module: 'SPACESHIP',
+      },
+      {
+        method: 'DELETE',
+        apiPath: '/api/v1/spaceship/:id',
+        name: 'delete spaceship',
+        module: 'SPACESHIP',
+      },
+      {
+        method: 'GET',
+        apiPath: '/api/v1/spaceship/domains/:id',
+        name: 'get spaceship domain list',
+        module: 'SPACESHIP',
+      },
+      {
+        method: 'GET',
+        apiPath: '/api/v1/spaceship/domains/:conect_id/detail/:domain',
+        name: 'get spaceship domain detail',
+        module: 'SPACESHIP',
+      },
+      {
+        method: 'POST',
+        apiPath: '/api/v1/spaceship/domains/update_nameservers',
+        name: 'update spaceship nameservers',
+        module: 'SPACESHIP',
+      },
+      {
+        method: 'POST',
+        apiPath: '/api/v1/spaceship/domains/update_all_nameservers',
+        name: 'update all spaceship nameservers',
+        module: 'SPACESHIP',
+      },
     ];
 
     for (const permission of permissions) {

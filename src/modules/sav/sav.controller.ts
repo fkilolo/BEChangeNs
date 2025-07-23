@@ -147,24 +147,28 @@ export class SavController {
     return this.savService.updateDomainNameservers(body.domain_name, body.ns_1, body.ns_2, user);
   }
 
-  @Post('update-all-nameservers')
-  @ApiOperation({ summary: 'Cập nhật nameservers cho tất cả domain đang active' })
+  @Post('update-nameservers-by-domains')
+  @ApiOperation({ summary: 'Cập nhật nameservers cho danh sách domain được chọn' })
   @ApiBody({
     schema: {
       type: 'object',
-      required: ['ns_1', 'ns_2'],
+      required: ['ns_1', 'ns_2', 'domainList'],
       properties: {
         ns_1: { type: 'string', example: 'ns1.sav.com' },
         ns_2: { type: 'string', example: 'ns2.sav.com' },
+        domainList: {
+          type: 'array',
+          items: { type: 'string', example: 'example.com' },
+        },
       },
     },
   })
-  
-  updateAllDomainNameservers(
-    @Body() body: { ns_1: string; ns_2: string },
+  updateSelectedDomainNameservers(
+    @Body() body: { ns_1: string; ns_2: string; domainList: string[] },
     @User() user: IUser,
   ) {
-    return this.savService.updateAllDomainNameservers(body.ns_1, body.ns_2, user);
+    const { ns_1, ns_2, domainList } = body;
+    return this.savService.updateSelectedDomainNameservers(ns_1, ns_2, domainList, user);
   }
   
 

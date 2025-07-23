@@ -321,6 +321,54 @@ export class PermissionSeederService implements OnModuleInit {
         name: 'update all spaceship nameservers',
         module: 'SPACESHIP',
       },
+        {
+          method: 'POST',
+          apiPath: '/api/v1/godady',
+          name: 'create godady',
+          module: 'GODADY',
+        },
+        {
+          method: 'GET',
+          apiPath: '/api/v1/godady',
+          name: 'get godady list',
+          module: 'GODADY',
+        },
+        {
+          method: 'PATCH',
+          apiPath: '/api/v1/godady/:id',
+          name: 'update godady',
+          module: 'GODADY',
+        },
+        {
+          method: 'DELETE',
+          apiPath: '/api/v1/godady/:id',
+          name: 'delete godady',
+          module: 'GODADY',
+        },
+        {
+          method: 'GET',
+          apiPath: '/api/v1/godady/domains/list',
+          name: 'get godady domain list',
+          module: 'GODADY',
+        },
+        {
+          method: 'POST',
+          apiPath: '/api/v1/godady/update-nameserver',
+          name: 'update godady nameserver',
+          module: 'GODADY',
+        },
+        {
+          method: 'POST',
+          apiPath: '/api/v1/godady/update-nameservers',
+          name: 'update godady nameservers (bulk)',
+          module: 'GODADY',
+        },
+        {
+          method: 'GET',
+          apiPath: '/api/v1/godady/:id',
+          name: 'get godady by id',
+          module: 'GODADY',
+        },
     ];
 
     for (const permission of permissions) {

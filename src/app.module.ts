@@ -14,7 +14,9 @@ import { JwtAuthGuard } from './app-auth/auth/jwt-auth.guard';
 import { ThrottlerModule } from "@nestjs/throttler";
 import { SavModule } from './modules/sav/sav.module';
 import { SpaceshipModule } from './modules/spaceship/spaceship.module';
+import { GodadyModule } from './modules/godady/godady.module';
 import { DynadotModule } from './modules/dynadot/dynadot.module';
+
 @Module({
   imports: [
     UsersModule,
@@ -66,6 +68,7 @@ import { DynadotModule } from './modules/dynadot/dynadot.module';
     }),
     SavModule,
     SpaceshipModule,
+    GodadyModule,
     DynadotModule
   ],
   controllers: [AppController],

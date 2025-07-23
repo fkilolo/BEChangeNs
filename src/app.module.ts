@@ -15,6 +15,8 @@ import { ThrottlerModule } from "@nestjs/throttler";
 import { SavModule } from './modules/sav/sav.module';
 import { SpaceshipModule } from './modules/spaceship/spaceship.module';
 import { GodadyModule } from './modules/godady/godady.module';
+import { DynadotModule } from './modules/dynadot/dynadot.module';
+
 @Module({
   imports: [
     UsersModule,
@@ -66,7 +68,8 @@ import { GodadyModule } from './modules/godady/godady.module';
     }),
     SavModule,
     SpaceshipModule,
-    GodadyModule
+    GodadyModule,
+    DynadotModule
   ],
   controllers: [AppController],
   providers: [

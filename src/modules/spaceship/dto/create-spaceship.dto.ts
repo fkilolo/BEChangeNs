@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNumber } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsString, IsNumber, IsOptional } from 'class-validator';
 
 export class CreateSpaceshipDto {
   @ApiProperty()
@@ -18,7 +18,8 @@ export class CreateSpaceshipDto {
   @IsNumber()
   total_domain: number;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsString()
-  userName: string;
+  @IsOptional()
+  userName?: string;
 } 

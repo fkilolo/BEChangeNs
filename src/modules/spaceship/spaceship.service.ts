@@ -6,6 +6,7 @@ import { CreateSpaceshipDto } from './dto/create-spaceship.dto';
 import { UpdateSpaceshipDto } from './dto/update-spaceship.dto';
 import axios from 'axios';
 import * as dotenv from 'dotenv';
+import { IUser } from '../users/users.interface';
 dotenv.config();
 
 const SPACESHIP_API_BASE = process.env.SPACESHIP_API_BASE || 'https://spaceship.dev/api/v1';
@@ -16,7 +17,14 @@ export class SpaceshipService {
     @InjectModel(Spaceship.name) private readonly spaceshipModel: Model<Spaceship>,
   ) {}
 
-  async create(createDto: CreateSpaceshipDto) {
+  async create(createDto: CreateSpaceshipDto, user: IUser) {
+    createDto.userName = user.userName;
+
+    const existing = await this.spaceshipModel.findOne({ userName: createDto.userName });
+    if (existing) {
+      throw new BadRequestException('Tên kết nối Spaceship đã tồn tại');
+    }
+
     return this.spaceshipModel.create(createDto);
   }
 

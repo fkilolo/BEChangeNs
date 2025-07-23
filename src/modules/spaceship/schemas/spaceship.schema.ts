@@ -15,7 +15,7 @@ export class Spaceship extends Document {
   @Prop({ required: true, default: 0 })
   total_domain: number;
 
-  @Prop({ required: true })
+  @Prop()
   userName: string;
 }
 

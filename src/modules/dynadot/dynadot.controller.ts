@@ -1,8 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { DynadotService } from './dynadot.service';
 import { CreateDynadotDto } from './dto/create-dynadot.dto';
 import { UpdateDynadotDto } from './dto/update-dynadot.dto';
+import { UpdateNameserversDto } from './dto/update-nameservers.dto';
+import { UpdateAllNameserversDto } from './dto/update-all-nameservers.dto';
 import { ResponseMessage, User } from 'src/shared/decorators/customize.decorator';
 import { IUser } from 'src/modules/users/users.interface';
 
@@ -45,5 +47,35 @@ export class DynadotController {
   @ApiOperation({ summary: 'Xóa dynadot connect' })
   remove(@Param('id') id: string) {
     return this.dynadotService.remove(id);
+  }
+
+  @Get('domains/:id')
+  @ResponseMessage('Lấy danh sách domain từ dynadot thành công')
+  @ApiOperation({ summary: 'Lấy danh sách domain từ dynadot connect' })
+  getDomains(@Param('id') id: string) {
+    return this.dynadotService.getDomains(id);
+  }
+
+  @Get('domains/:conect_id/detail/:domain')
+  @ResponseMessage('Lấy chi tiết domain từ dynadot thành công')
+  @ApiOperation({ summary: 'Lấy chi tiết domain từ dynadot connect' })
+  getDomainDetail(@Param('conect_id') conect_id: string, @Param('domain') domain: string) {
+    return this.dynadotService.getDomainDetail(conect_id, domain);
+  }
+
+  @Post('domains/update_nameservers')
+  @ResponseMessage('Cập nhật nameserver cho domain thành công')
+  @ApiOperation({ summary: 'Cập nhật nameserver cho nhiều domain qua dynadot' })
+  @ApiBody({ type: UpdateNameserversDto })
+  updateNameservers(@Body() body: UpdateNameserversDto) {
+    return this.dynadotService.updateNameservers(body);
+  }
+
+  @Post('domains/update_all_nameservers')
+  @ResponseMessage('Cập nhật nameserver cho toàn bộ domain thành công')
+  @ApiOperation({ summary: 'Cập nhật nameserver cho toàn bộ domain qua dynadot' })
+  @ApiBody({ type: UpdateAllNameserversDto })
+  updateAllNameservers(@Body() body: UpdateAllNameserversDto) {
+    return this.dynadotService.updateAllNameservers(body);
   }
 } 

@@ -16,6 +16,7 @@ import { SavModule } from './modules/sav/sav.module';
 import { SpaceshipModule } from './modules/spaceship/spaceship.module';
 import { GodadyModule } from './modules/godady/godady.module';
 import { DynadotModule } from './modules/dynadot/dynadot.module';
+import { EpikModule } from './modules/epik/epik.module';
 
 @Module({
   imports: [
@@ -69,7 +70,8 @@ import { DynadotModule } from './modules/dynadot/dynadot.module';
     SavModule,
     SpaceshipModule,
     GodadyModule,
-    DynadotModule
+    DynadotModule,
+    EpikModule
   ],
   controllers: [AppController],
   providers: [

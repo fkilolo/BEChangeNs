@@ -369,6 +369,61 @@ export class PermissionSeederService implements OnModuleInit {
           name: 'get godady by id',
           module: 'GODADY',
         },
+        {
+          method: 'POST',
+          apiPath: '/api/v1/epik',
+          name: 'create epik',
+          module: 'EPIK',
+        },
+        {
+          method: 'GET',
+          apiPath: '/api/v1/epik',
+          name: 'get epik list',
+          module: 'EPIK',
+        },
+        {
+          method: 'PATCH',
+          apiPath: '/api/v1/epik/:id',
+          name: 'update epik',
+          module: 'EPIK',
+        },
+        {
+          method: 'DELETE',
+          apiPath: '/api/v1/epik/:id',
+          name: 'delete epik',
+          module: 'EPIK',
+        },
+        {
+          method: 'GET',
+          apiPath: '/api/v1/epik/:id',
+          name: 'get epik by id',
+          module: 'EPIK',
+        },
+        {
+          method: 'GET',
+          apiPath: '/api/v1/epik/domains/list',
+          name: 'get epik domain list',
+          module: 'EPIK',
+        },
+        {
+          method: 'POST',
+          apiPath: '/api/v1/epik/update-nameserver',
+          name: 'update epik nameserver',
+          module: 'EPIK',
+        },
+        {
+          method: 'POST',
+          apiPath: '/api/v1/epik/update-nameservers',
+          name: 'update epik nameservers (bulk)',
+          module: 'EPIK',
+        },
+        {
+          method: 'GET',
+          apiPath: '/api/v1/epik/domains/:domain/info',
+          name: 'get epik domain info',
+          module: 'EPIK',
+        },
+        
     ];
 
     for (const permission of permissions) {

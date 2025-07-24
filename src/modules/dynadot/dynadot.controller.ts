@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiQuery, ApiBody, ApiParam } from '@nestjs/swagger';
 import { DynadotService } from './dynadot.service';
 import { CreateDynadotDto } from './dto/create-dynadot.dto';
 import { UpdateDynadotDto } from './dto/update-dynadot.dto';
@@ -52,8 +52,19 @@ export class DynadotController {
   @Get('domains/:id')
   @ResponseMessage('Lấy danh sách domain từ dynadot thành công')
   @ApiOperation({ summary: 'Lấy danh sách domain từ dynadot connect' })
-  getDomains(@Param('id') id: string) {
-    return this.dynadotService.getDomains(id);
+  @ApiParam({ name: 'id', required: true, type: String, description: 'ID của kết nối dynadot' })
+  @ApiQuery({ name: 'take', required: false, type: Number, description: 'Số lượng domain lấy về' })
+  @ApiQuery({ name: 'skip', required: false, type: Number, description: 'Bỏ qua bao nhiêu domain đầu' })
+  @ApiQuery({ name: 'orderBy', required: false, type: String, description: 'Sắp xếp theo trường nào (chỉ nhận: count_asc, count_desc, name_asc, name_desc)' })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Tìm kiếm theo tên domain' })
+  getDomains(
+    @Param('id') id: string,
+    @Query('take') take?: number,
+    @Query('skip') skip?: number,
+    @Query('orderBy') orderBy?: string,
+    @Query('search') search?: string
+  ) {
+    return this.dynadotService.getDomains(id, take, skip, orderBy, search);
   }
 
   @Get('domains/:conect_id/detail/:domain')

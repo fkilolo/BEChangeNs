@@ -25,20 +25,8 @@ export class EpikService {
     private readonly epikModel: Model<EpikDocument>,
   ) {}
 
-  private async getSignatureByUser(user: IUser): Promise<string> {
-    const userName = user?.userName;
-    if (!userName) throw new BadRequestException('User không hợp lệ');
-
-    const account = await this.epikModel.findOne({ userName });
-    if (!account || !account.signature) {
-      throw new BadRequestException('Tài khoản Epik chưa cấu hình signature');
-    }
-
-    return account.signature;
-  }
 
   async create(createDto: CreateEpikDto, user: IUser) {
-    createDto.userName = user.userName;
 
     const existing = await this.epikModel.findOne({ userName: createDto.userName });
     if (existing) throw new BadRequestException('Tài khoản Epik đã tồn tại');
@@ -88,9 +76,15 @@ export class EpikService {
     return this.epikModel.deleteOne({ _id: id });
   }
 
-  async getDomains(user: IUser) {
+  async getDomains(id: string, user: IUser) {
+    const connect = await this.epikModel.findById(id);
+    if (!connect) throw new NotFoundException('Epik connect not found');
+    const signature = connect.signature;
+
+    if (!signature) {
+      throw new BadRequestException('Thiếu chữ ký signature');
+    }
     try {
-      const signature = await this.getSignatureByUser(user);
       const url = `${EPIK_API_BASE}/domains?SIGNATURE=${signature}`;
       const res = await axios.get(url);
       return res.data;
@@ -100,9 +94,15 @@ export class EpikService {
     }
   }
 
-  async updateNameserver(domain: string, ns1: string, ns2: string, user: IUser) {
+  async updateNameserver(id: string, domain: string, ns1: string, ns2: string, user: IUser) {
     try {
-      const signature = await this.getSignatureByUser(user);
+      const connect = await this.epikModel.findById(id);
+      if (!connect) throw new NotFoundException('Epik connect not found');
+      const signature = connect.signature;
+  
+      if (!signature) {
+        throw new BadRequestException('Thiếu chữ ký signature');
+      }
       const url = `${EPIK_API_BASE}/domains/${domain}/name_servers?SIGNATURE=${signature}`;
       const body = {
         nses: { ns1, ns2 },
@@ -120,9 +120,15 @@ export class EpikService {
     }
   }
 
-  async updateNameserversBulk(domains: string[], ns1: string, ns2: string, user: IUser) {
+  async updateNameserversBulk(id: string, domains: string[], ns1: string, ns2: string, user: IUser) {
     if (!domains.length) throw new BadRequestException('Danh sách domain không được rỗng');
-    const signature = await this.getSignatureByUser(user);
+    const connect = await this.epikModel.findById(id);
+    if (!connect) throw new NotFoundException('Epik connect not found');
+    const signature = connect.signature;
+
+    if (!signature) {
+      throw new BadRequestException('Thiếu chữ ký signature');
+    }
 
     const results = await Promise.allSettled(
       domains.map((domain) => {
@@ -147,9 +153,15 @@ export class EpikService {
       error: res.status === 'rejected' ? res.reason?.message : null,
     }));
   }
-  async getDomainInfo(domain: string, user: IUser) {
+  async getDomainInfo(id: string, domain: string, user: IUser) {
     try {
-      const signature = await this.getSignatureByUser(user);
+      const connect = await this.epikModel.findById(id);
+      if (!connect) throw new NotFoundException('Epik connect not found');
+      const signature = connect.signature;
+  
+      if (!signature) {
+        throw new BadRequestException('Thiếu chữ ký signature');
+      }
       const url = `${EPIK_API_BASE}/domains/${domain}/info?SIGNATURE=${signature}`;
       const res = await axios.get(url, {
         headers: {

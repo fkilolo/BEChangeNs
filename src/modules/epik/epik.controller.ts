@@ -38,13 +38,13 @@ export class EpikController {
     return this.epikService.findAll(+current, +pageSize, qs, user);
   }
 
-  @Get('domains/list')
+  @Get('domains/list/:id')
   @ApiOperation({ summary: 'Lấy danh sách domain từ Epik' })
-  getDomains(@User() user: IUser) {
-    return this.epikService.getDomains(user);
+  getDomains(@Param('id') id: string, @User() user: IUser) {
+    return this.epikService.getDomains(id, user);
   }
 
-  @Post('update-nameserver')
+  @Post('update-nameserver/:id')
   @ApiOperation({ summary: 'Cập nhật nameserver cho một domain Epik' })
   @ApiBody({
     schema: {
@@ -57,11 +57,11 @@ export class EpikController {
       },
     },
   })
-  updateNameserver(@Body() body: { domain: string; ns1: string; ns2: string }, @User() user: IUser) {
-    return this.epikService.updateNameserver(body.domain, body.ns1, body.ns2, user);
+  updateNameserver(@Param('id') id: string, @Body() body: { domain: string; ns1: string; ns2: string }, @User() user: IUser) {
+    return this.epikService.updateNameserver(id, body.domain, body.ns1, body.ns2, user);
   }
 
-  @Post('update-nameservers')
+  @Post('update-nameservers/:id')
   @ApiOperation({ summary: 'Cập nhật nameserver cho danh sách domain Epik' })
   @ApiBody({
     schema: {
@@ -77,8 +77,8 @@ export class EpikController {
       },
     },
   })
-  updateNameservers(@Body() body: { domainList: string[]; ns1: string; ns2: string }, @User() user: IUser) {
-    return this.epikService.updateNameserversBulk(body.domainList, body.ns1, body.ns2, user);
+  updateNameservers(@Param('id') id: string, @Body() body: { domainList: string[]; ns1: string; ns2: string }, @User() user: IUser) {
+    return this.epikService.updateNameserversBulk(id, body.domainList, body.ns1, body.ns2, user);
   }
 
   @Get(':id')
@@ -101,10 +101,10 @@ export class EpikController {
     return this.epikService.remove(id);
   }
 
-  @Get('domains/:domain/info')
+  @Get('domains/:domain/info/:id')
   @ApiOperation({ summary: 'Lấy thông tin chi tiết domain từ Epik' })
-  getDomainInfo(@Param('domain') domain: string, @User() user: IUser) {
-    return this.epikService.getDomainInfo(domain, user);
+  getDomainInfo(@Param('domain') domain: string, @Param('id') id: string, @User() user: IUser) {
+    return this.epikService.getDomainInfo(id, domain, user);
   }
 
 }

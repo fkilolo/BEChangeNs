@@ -69,12 +69,34 @@ export class DynadotService {
     return doc;
   }
 
-  async getDomains(id: string) {
+  async getDomains(id: string, take?: number, skip?: number, orderBy?: string, search?: string) {
     // Lấy thông tin connect từ DB
     const connect = await this.dynadotModel.findById(id);
     if (!connect) throw new NotFoundException('Dynadot connect not found');
     const apikey = connect.apikey;
     if (!apikey) throw new NotFoundException('Thiếu apikey');
+
+    // Xử lý query param cho Dynadot
+    if (search) {
+      const detail = await this.getDomainDetail(id, search);
+      let domainInfoItem = detail;
+      // Nếu detail trả về {code, message, data: {domainInfo: [...]}} thì lấy domainInfo[0]
+      if (detail && detail.data && Array.isArray(detail.data.domainInfo)) {
+        domainInfoItem = detail.data.domainInfo[0];
+      }
+      return {
+        code: '200',
+        message: 'Success',
+        data: {
+          domainInfo: domainInfoItem ? [domainInfoItem] : []
+        }
+      };
+    }
+    const params: any = {};
+    if (typeof take === 'number' && take > 0) params.count_per_page = take;
+    if (typeof skip === 'number' && skip >= 0) params.page_index = Math.floor((skip / (take || 10)) + 1);
+    if (orderBy) params.sort = orderBy;
+    // search không hỗ trợ trực tiếp, nếu cần thì filter sau khi lấy về
 
     const url = `${DYNADOT_API_BASE}/domains`;
     const headers = {
@@ -82,7 +104,7 @@ export class DynadotService {
       'Authorization': `Bearer ${apikey}`
     };
     try {
-      const res = await axios.get(url, { headers });
+      const res = await axios.get(url, { headers, params });
       return res.data;
     } catch (err) {
       throw new NotFoundException(err?.response?.data?.message || 'Lỗi lấy domain từ dynadot');

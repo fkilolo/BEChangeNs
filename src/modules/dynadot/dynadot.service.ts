@@ -5,6 +5,11 @@ import { Dynadot } from './schemas/dynadot.schema';
 import { CreateDynadotDto } from './dto/create-dynadot.dto';
 import { UpdateDynadotDto } from './dto/update-dynadot.dto';
 import { IUser } from '../users/users.interface';
+import axios from 'axios';
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+const DYNADOT_API_BASE = process.env.DYNADOT_API_BASE || 'https://api-sandbox.dynadot.com/restful/v1';
 
 @Injectable()
 export class DynadotService {
@@ -62,5 +67,121 @@ export class DynadotService {
     const doc = await this.dynadotModel.findByIdAndDelete(id);
     if (!doc) throw new NotFoundException('Dynadot not found');
     return doc;
+  }
+
+  async getDomains(id: string) {
+    // Lấy thông tin connect từ DB
+    const connect = await this.dynadotModel.findById(id);
+    if (!connect) throw new NotFoundException('Dynadot connect not found');
+    const apikey = connect.apikey;
+    if (!apikey) throw new NotFoundException('Thiếu apikey');
+
+    const url = `${DYNADOT_API_BASE}/domains`;
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${apikey}`
+    };
+    try {
+      const res = await axios.get(url, { headers });
+      return res.data;
+    } catch (err) {
+      throw new NotFoundException(err?.response?.data?.message || 'Lỗi lấy domain từ dynadot');
+    }
+  }
+
+  async getDomainDetail(id: string, domain: string) {
+    // Lấy thông tin connect từ DB
+    const connect = await this.dynadotModel.findById(id);
+    if (!connect) throw new NotFoundException('Dynadot connect not found');
+    const apikey = connect.apikey;
+    if (!apikey) throw new NotFoundException('Thiếu apikey');
+
+    // Dùng base production nếu cần, mặc định lấy từ ENV
+    const url = `${DYNADOT_API_BASE}/domains/${encodeURIComponent(domain)}`;
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${apikey}`
+    };
+    try {
+      const res = await axios.get(url, { headers });
+      return res.data;
+    } catch (err) {
+      throw new NotFoundException(err?.response?.data?.message || 'Lỗi lấy chi tiết domain dynadot');
+    }
+  }
+
+  async updateNameservers(body: {
+    conect_id: string;
+    domain: string[];
+    hosts: string[];
+  }) {
+    const { conect_id, domain, hosts } = body;
+    // Lấy thông tin connect từ DB
+    const connect = await this.dynadotModel.findById(conect_id);
+    if (!connect) throw new NotFoundException('Dynadot connect not found');
+    const apikey = connect.apikey;
+    const secretkey = connect.secretkey;
+    if (!apikey || !secretkey) throw new NotFoundException('Thiếu apikey hoặc secretkey');
+
+    // Validate input
+    if (!Array.isArray(domain) || domain.length === 0) throw new NotFoundException('Danh sách domain không hợp lệ');
+    if (!Array.isArray(hosts) || hosts.length === 0) throw new NotFoundException('Danh sách hosts không hợp lệ');
+
+    // Gọi API update cho từng domain (tuần tự)
+    const headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apikey}`,
+      'X-Signature': secretkey
+    };
+    const results = [];
+    for (const d of domain) {
+      const url = `${DYNADOT_API_BASE}/domains/${encodeURIComponent(d)}/nameservers`;
+      try {
+        const res = await axios.put(url, { nameserver_list: hosts }, { headers });
+        results.push({ domain: d, success: true, data: res.data });
+      } catch (err) {
+        results.push({ domain: d, success: false, error: err?.response?.data?.message || err.message });
+      }
+    }
+    return results;
+  }
+
+  async updateAllNameservers(body: {
+    conect_id: string;
+    hosts: string[];
+  }) {
+    const { conect_id, hosts } = body;
+    // Lấy thông tin connect từ DB
+    const connect = await this.dynadotModel.findById(conect_id);
+    if (!connect) throw new NotFoundException('Dynadot connect not found');
+    const apikey = connect.apikey;
+    const secretkey = connect.secretkey;
+    if (!apikey || !secretkey) throw new NotFoundException('Thiếu apikey hoặc secretkey');
+
+    // Lấy tất cả domain
+    const url = `${DYNADOT_API_BASE}/domains`;
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${apikey}`
+    };
+    let domains: string[] = [];
+    try {
+      const res = await axios.get(url, { headers });
+      if (Array.isArray(res.data?.data?.domainInfo)) {
+        domains = res.data.data.domainInfo.map((item: any) => item.domainName).filter(Boolean);
+      }
+    } catch (err) {
+      throw new NotFoundException('Không lấy được danh sách domain từ dynadot');
+    }
+    if (!domains.length) throw new NotFoundException('Không có domain nào để cập nhật');
+
+    // Gọi update nameserver cho toàn bộ domain (tuần tự)
+    const updateBody = {
+      conect_id,
+      domain: domains,
+      hosts
+    };
+    return this.updateNameservers(updateBody);
   }
 } 
